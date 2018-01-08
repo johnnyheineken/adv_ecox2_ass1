@@ -126,7 +126,6 @@ cov_freq_asym_jk = np.mean(np.logical_and(beta > lcl_asym_jk, beta < ucl_asym_jk
 #%%
  
 
-cov_freq_asym_b = np.mean(np.logical_and(beta > lcl_asym_b, beta < ucl_asym_b))
 
 
 
