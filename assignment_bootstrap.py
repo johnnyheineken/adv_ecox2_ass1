@@ -43,6 +43,7 @@ for i in range(rep):
   ucl_asym[i] = bhat[i] + 1.96 * se[i]
 
 cov_freq_asym = np.mean(np.logical_and(beta > lcl_asym, beta < ucl_asym))
+print(cov_freq_asym)
 
 #%%
 # question 2
@@ -62,14 +63,16 @@ for n in range(50, 2500, 50):
   if 0.9365 < np.mean(np.logical_and(beta > lcl_asym, beta < ucl_asym)) < 0.9635:
     minimal = n
     break
+  
+print(minimal)
     
+
 #%%
 # question 3
 np.random.seed(1429)
 n = 50
-x = np.exp(np.random.normal(m, s, (n, 1)))
 
-# bootstrap equivalents
+# bootstrap/jackknife equivalents
 xbar_b = np.zeros((rep, 1)) # average of original sample
 bias_corr_b = np.zeros((rep, 1)) # estiamte of beta
 bias_corr_jk = np.zeros((rep, 1)) # estiamte of beta
@@ -81,8 +84,8 @@ lcl_asym_jk = np.zeros((rep, 1)) # lower confidence limit (asym)
 ucl_asym_b = np.zeros((rep, 1)) # upper confidence limit (asym)
 ucl_asym_jk = np.zeros((rep, 1)) # upper confidence limit (asym)
 
-
 for i in range(rep):
+  # we generate the data and then get the standard estimate
   x = np.exp(np.random.normal(m, s, (n, 1)))
 
   # bootstrap
@@ -121,18 +124,74 @@ for i in range(rep):
 
 cov_freq_asym_b = np.mean(np.logical_and(beta > lcl_asym_b, beta < ucl_asym_b))
 cov_freq_asym_jk = np.mean(np.logical_and(beta > lcl_asym_jk, beta < ucl_asym_jk))
-  
+
+print(cov_freq_asym_b)
+print(cov_freq_asym_jk)
+
+
 
 #%%
- 
+# question 4
+np.random.seed(1429)
+n = 50
+
+# reseting the previous arrays
+se_b = np.zeros((rep, 1)) # standard error bhat (asymptotic)
+se_jk = np.zeros((rep, 1)) # standard error bhat (asymptotic)
+trat_b = np.zeros((rep, 1)) # t-ratio
+trat_jk = np.zeros((rep, 1)) # t-ratio
+lcl_asym_b2 = np.zeros((rep, 1)) # lower confidence limit (asym)
+lcl_asym_jk2 = np.zeros((rep, 1)) # lower confidence limit (asym)
+ucl_asym_b2 = np.zeros((rep, 1)) # upper confidence limit (asym)
+ucl_asym_jk2 = np.zeros((rep, 1)) # upper confidence limit (asym)
 
 
+for i in range(rep):
+  # generate data
+  x = np.exp(np.random.normal(m, s, (n, 1)))
+  xbar[i] = np.mean(x)
+  bhat[i] = np.sin(xbar[i])
+
+  # bootstrap
+  xbar_aux = np.zeros((boot, 1))
+  aux_bhat = np.zeros((boot, 1))
+  for k in range(boot):
+    index = np.random.randint(0, n - 1, n)
+    xbar_aux[k] = np.mean(x[[index]])
+    aux_bhat[k] = np.sin(xbar_aux[k])
+  
+  beta_b = np.mean(aux_bhat)
+  
+  se_b[i] = np.sqrt((1 / (boot - 1)) * np.sum((aux_bhat - beta_b) ** 2))
+  trat_b[i] = (bhat[i] - beta) / se_b[i]
+  lcl_asym_b2[i] = bhat[i] - 1.96 * se_b[i]
+  ucl_asym_b2[i] = bhat[i] + 1.96 * se_b[i]
+  
+  # jackknife
+  xbar_aux = np.zeros((n, 1))
+  aux_bhat = np.zeros((n, 1))
+  for k in range(n):
+    ind = np.ones(n, bool)
+    ind[k] = False
+    xbar_aux[k] = np.mean(x[ind])
+    aux_bhat[k] = np.sin(xbar_aux[k])
+    
+  beta_jk = np.mean(aux_bhat)
+
+  se_jk[i] = np.sqrt(((n - 1) / n) * np.sum((aux_bhat - beta_jk) ** 2))
+  trat_jk[i] = (bhat[i] - beta) / se_jk[i]
+  lcl_asym_jk2[i] = bhat[i] - 1.96 * se_jk[i]
+  ucl_asym_jk2[i] = bhat[i] + 1.96 * se_jk[i]
 
 
+cov_freq_asym_b2 = np.mean(np.logical_and(beta > lcl_asym_b2, beta < ucl_asym_b2))
+cov_freq_asym_jk2 = np.mean(np.logical_and(beta > lcl_asym_jk2, beta < ucl_asym_jk2))
+
+print(cov_freq_asym_b2)
+print(cov_freq_asym_jk2)
 
 
-
-
+#%%
 
 
   
