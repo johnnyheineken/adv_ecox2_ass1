@@ -161,11 +161,11 @@ def calculate_bs2(X, bootrep):
         indices = np.random.randint(0, high=N, size=N)
         bootstrap = [X[j] for j in indices.tolist()]
         bhat_bs[i] = sin(mean(bootstrap))
-        # se = sqrt(var(bootstrap) * 1 / N) * np.abs(cos(bhat_bs[i]))
-        # tstat = (bhat_bs[i] - bhat) / se
+        se = sqrt(var(bootstrap) * 1 / N) * np.abs(cos(bhat_bs[i]))
+        tstat[i] = (bhat_bs[i] - beta) / se
 
     se_bs = std(bhat_bs)
-    tstat = [(i - beta) / se_bs for i in bhat_bs.tolist()]
+    # tstat = [(i - beta) / se_bs for i in bhat_bs.tolist()]
     theta_bs = 2 * bhat - mean(bhat_bs)
     lower_perc = np.percentile(bhat_bs, 2.5)
     upper_perc = np.percentile(bhat_bs, 97.5)
